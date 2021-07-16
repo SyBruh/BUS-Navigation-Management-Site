@@ -1,5 +1,31 @@
 <?php 
 include 'Connect.php';
+
+if(isset($_POST['btnSave'])) 
+{
+    $cmdBuaStop=$_POST['cmdBuaStop'];
+    $cmdBusNo=$_POST['cmdBusNo'];
+    $txtStopOrder=$_POST['txtStopOrder'];
+
+		$Insert="INSERT INTO `br`
+				(`BusStopID`,`BusTypeID`,`StopOrder`)
+				VALUES 
+				('$cmdBuaStop','$cmdBusNo','$txtStopOrder')
+				";
+		$ret=mysqli_query($connection,$Insert);
+
+		if($ret) //True
+		{
+			echo "<script>window.alert('SUCCESS : BR Created')</script>";
+			echo "<script>window.location='BR.php'</script>";
+		}
+		else
+		{
+			echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
+		}
+	
+}
+
  ?>
 <!DOCTYPE html>
 <html>
@@ -39,8 +65,21 @@ include 'Connect.php';
 	<td>BusNo</td>
 	<td>
 		<select name="cmdBusNo" id="" required>
-			<option value=""></option>
-			<option value=""></option>
+			<option>Choose BusNo</option>
+			<?php  
+			$BusNo_query="SELECT * FROM bustype";
+			$BusNo_ret=mysqli_query($connection,$BusNo_query);
+			$BusNo_count=mysqli_num_rows($BusNo_ret);
+
+			for($i=0;$i<$BusNo_count;$i++) 
+			{ 
+				$row=mysqli_fetch_array($BusNo_ret);
+				$BusTypeID=$row['BusTypeID'];
+				$BusNo=$row['BusNo'];
+
+				echo "<option value='$BusTypeID'>$BusTypeID - $BusNo</option>";
+			}
+			?>
 		</select>
 	</td>
 </tr>

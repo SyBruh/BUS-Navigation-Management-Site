@@ -13,7 +13,7 @@ if(isset($_POST['btnSave']))
 	$txtBusRouteUrl=$_POST['txtBusRouteUrl'];
 
 
-		$Insert="INSERT INTO `cartype`
+		$Insert="INSERT INTO `bustype`
 				(`StartTime`,`StopTime`,`StartDestinationID`, `FinalDestinationID`, `NoofGates`,`BusNo`,`Price`, `BusRouteUrl`)
 				VALUES 
 				('$txtStartTime','$txtStopTime','$cmdStartStop','$cmdFinalStop', '$txtNoofGates','$txtBusNo','$txtPrice','$txtBusRouteUrl')

@@ -8,52 +8,40 @@ if(isset($_POST['btnCaculate']))
     $sbt = [];
     $fbt = [];
 
-	$BusStop_query="SELECT * FROM BusStop";
-	$BusStop_ret=mysqli_query($connection,$BusStop_query);
-	$BusStop_count=mysqli_num_rows($BusStop_ret);
+		$BusStop_query="SELECT * FROM BusStop";
+		$BusStop_ret=mysqli_query($connection,$BusStop_query);
+		$BusStop_count=mysqli_num_rows($BusStop_ret);
 
-	$BR_query="SELECT * FROM BR";
-	$BR_ret=mysqli_query($connection,$BR_query);
-	$BR_count=mysqli_num_rows($BR_ret);
+		$BR_query="SELECT * FROM BR";
+		$BR_ret=mysqli_query($connection,$BR_query);
+		$BR_count=mysqli_num_rows($BR_ret);
 
 
 
-	for($i=0;$i<$BusStop_count;$i++) 
-	{ 
-		$row=mysqli_fetch_array($BusStop_ret);
-		$BusStopID=$row['BusStopID'];
+		for($i=0;$i<$BusStop_count;$i++) 
+		{ 
+			$row=mysqli_fetch_array($BusStop_ret);
+			$BusStopID=$row['BusStopID'];
 
-		if ($BusStopID == $cmdStartDestination) 
-		{
-			for ($i=0; $i <$BR_count ; $i++) 
-			{ 
-				$row2=mysqli_fetch_array($BR_ret);
-				$BRBusTypeID = $row2['BusTypeID'];
-				$BRBusStopID = $row2['BusStopID'];
-				if ($BRBusStopID == $BusStopID) 
-				{
-					$sbt[] = $BRBusTypeID;
+			if ($BusStopID == $cmdStartDestination) 
+			{
+				for ($i=0; $i <$BR_count ; $i++) 
+				{ 
+					$row2=mysqli_fetch_array($BR_ret);
+					$BRBusTypeID = $row2['BusTypeID'];
+					$BRBusStopID = $row2['BusStopID'];
+					if ($BRBusStopID == $BusStopID) 
+					{
+						$sbt[] = $BRBusTypeID;
+					}
 				}
 			}
-		}
 
-		if ($BusStopID == $cmdFinalDestination) 
+		}
+		if ($sbt)
 		{
-			for ($i=0; $i <$BR_count ; $i++) 
-			{ 
-				$row2=mysqli_fetch_array($BR_ret);
-				$BRBusTypeID = $row2['BusTypeID'];
-				$BRBusStopID = $row2['BusStopID'];
-				if ($BRBusStopID == $BusStopID) 
-				{
-					$fbt[] = $BRBusTypeID;
-				}
-			}
+			echo "<script>window.alert('SUCCESS : BR Created')</script>";
 		}
-	}
-
-	print_r($sbt);
-	print_r($fbt);
 }
 ?>
 <!DOCTYPE html>
@@ -62,7 +50,7 @@ if(isset($_POST['btnCaculate']))
 	<title>Route Entry</title>
 </head>
 <body>
-<form action="Route.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
+<form action="array.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
 
 <fieldset>
 <legend>Enter Route Information :</legend>
