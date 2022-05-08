@@ -1,61 +1,71 @@
 <?php 
 include 'Connect.php';
 
-if(isset($_POST['btnSave'])) 
+if(isset($_POST['btnUpdate'])) 
 {
-    $cmdBuaStop=$_POST['cmdBuaStop'];
-    $cmdBusNo=$_POST['cmdBusNo'];
-    $txtStopOrder=$_POST['txtStopOrder'];
-	$Select="SELECT * FROM BR
-			WHERE BusTypeID='$cmdBusNo'
-			AND StopOrder='$txtStopOrder'
-			OR BusStopID='$cmdBuaStop'
-			AND BusTypeID='$cmdBusNo'";
-	$retSelect=mysqli_query($connection,$Select);
-	$Select_Count=mysqli_num_rows($retSelect);
-		if ($Select_Count>0) 
-		{
-			echo "<script>window.alert('Error :StopOrder Overlap')</script>";
-			echo "<script>window.location='BR.php'</script>";
-		}
-		else {
-			$Insert="INSERT INTO `br`
-				(`BusStopID`,`BusTypeID`,`StopOrder`)
-				VALUES 
-				('$cmdBuaStop','$cmdBusNo','$txtStopOrder')
-				";
-			$ret=mysqli_query($connection,$Insert);
+	$BusID=$_POST['txtBusID'];
+	$txtDriver=$_POST['txtDriver'];
+	$cmdBusNo=$_POST['cmdBusNo'];
 
-			if($ret) //True
-			{
-				echo "<script>window.alert('SUCCESS : BR Created')</script>";
-				echo "<script>window.location='BR.php'</script>";
-			}
-			else
-			{
-				echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-			}
-		}
+	$Update="UPDATE Bus
+			 SET
+			 DriverName='$txtDriver',
+			 BusTypeID='$cmdBusNo'
+			 WHERE
+			 BusID='$BusID'
+			 ";
+	$ret=mysqli_query($connection,$Update);
 
-		
-	
+	if($ret) //True
+	{
+		echo "<script>window.alert('SUCCESS : Bus Info Updated')</script>";
+		echo "<script>window.location='BusList.php'</script>";
+	}
+	else
+	{
+		echo "<p>Error : Something went wrong in Update" . mysqli_error($connection) . "</p>";
+	}
+}
+
+if (isset($_GET['BusID'])) 
+{
+	$BusID=$_GET['BusID'];
+
+	$Bus_List="SELECT bt.*, b.*
+				 FROM BusType bt, Bus b
+				 WHERE bt.BusTypeID=b.BusTypeID
+                 AND BusID='$BusID'";
+	$Bus_ret=mysqli_query($connection,$Bus_List);
+	$Bus_count=mysqli_num_rows($Bus_ret);
+	$rows=mysqli_fetch_array($Bus_ret);
+
+	if($Bus_count < 1) 
+	{
+		echo "<script>window.alert('ERROR : Bus Info Not Found')</script>";
+		echo "<script>window.location='BusUpdate.php'</script>";
+	}
+}
+else
+{
+	$BusID="";
 }
 
  ?>
 <!DOCTYPE html>
 <html lang="en" class="h-100">
 <head>
-	<title>BR Entry</title>
+	<title>Bus Entry</title>
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <title>Document</title>
+    <title>Destination</title>
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  
 </head>
 <body class="h-100">
 <nav class="navbar navbar-dark bg-dark fixed-top">
@@ -87,11 +97,11 @@ if(isset($_POST['btnSave']))
             <a class="dropdown-item" href="RouteList.php">Route Lists</a>
           </div>
         </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="UserInfoList.php">Users Information</a>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#">Users Information</a>
         </li>
         <li class="nav-item active">
-          <a class="nav-link" href="ManagerLogin.php">Logout</a>
+          <a class="nav-link" href="UserInfoList.php">Users Information</a>
         </li>
       </ul>
     </div>
@@ -99,55 +109,37 @@ if(isset($_POST['btnSave']))
 <div class="container h-100">
 <div class="row h-100 justify-content-center align-items-center">
 <div class="col-10 col-md-8 col-lg-6">
-<form action="BR.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
+<form action="BusUpdate.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
 
 <fieldset>
-<legend>Enter Assign BusStop Information :</legend>
+<legend>Enter Bus Information :</legend>
+<input type="hidden" name="txtBusID" value="<?php echo $BusID ?>">
 <div class="form-group">
-	<label for="BusStop">BusStop</label>
-    <select class="form-control" id="BusStop" name="cmdBuaStop">
-    <option>Choose BusStop</option>
-		<?php  
-		$BusStop_query="SELECT * FROM BusStop";
-		$BusStop_ret=mysqli_query($connection,$BusStop_query);
-		$BusStop_count=mysqli_num_rows($BusStop_ret);
-
-		for($i=0;$i<$BusStop_count;$i++) 
-		{ 
-			$row=mysqli_fetch_array($BusStop_ret);
-			$BusStopID=$row['BusStopID'];
-			$BusStop=$row['BusStop'];
-
-			echo "<option value='$BusStopID'>$BusStopID - $BusStop</option>";
-		}
-		?>
-    </select>
+	<label for="Driver">Driver</label>
+	<input type="text" class="form-control" id="Destination" value="<?php echo $rows['DriverName'] ?>" name="txtDriver" required/>
 </div>
 <div class="form-group">
 	<label for="BusNo">BusNo</label>
-    <select class="form-control" id="BusNo" name="cmdBusNo">
+    <select class="form-control" id="BusNoSearch" name="cmdBusNo">
+    <option value="<?php echo $rows['BusTypeID'] ?>"><?php echo $rows['BusNo'] ?></option>
     <option>Choose BusNo</option>
-		<?php  
-		$BusNo_query="SELECT * FROM bustype";
-		$BusNo_ret=mysqli_query($connection,$BusNo_query);
-		$BusNo_count=mysqli_num_rows($BusNo_ret);
+			<?php  
+			$BusNo_query="SELECT * FROM bustype";
+			$BusNo_ret=mysqli_query($connection,$BusNo_query);
+			$BusNo_count=mysqli_num_rows($BusNo_ret);
 
-		for($i=0;$i<$BusNo_count;$i++) 
-		{ 
-			$row=mysqli_fetch_array($BusNo_ret);
-			$BusTypeID=$row['BusTypeID'];
-			$BusNo=$row['BusNo'];
+			for($i=0;$i<$BusNo_count;$i++) 
+			{ 
+				$row=mysqli_fetch_array($BusNo_ret);
+				$BusTypeID=$row['BusTypeID'];
+				$BusNo=$row['BusNo'];
 
-			echo "<option value='$BusTypeID'>$BusTypeID - $BusNo</option>";
-		}
-		?>
+				echo "<option value='$BusTypeID'>$BusTypeID - $BusNo</option>";
+			}
+			?>
     </select>
 </div>
-<div class="form-group">
-	<label for="Stop_Order">Stop_Order</label>
-	<input type="number" class="form-control" id="Stop_Order" name="txtStopOrder" min="1" max="40" placeholder="No" required/>
-</div>
-<button type="submit" class="btn btn-primary btn-customized" name="btnSave">Save</button>
+<button type="submit" class="btn btn-primary btn-customized" name="btnUpdate">Update</button>
 <button type="reset" class="btn btn-primary btn-customized" name="btnClear">Clear</button>
 </fieldset>
 </form>

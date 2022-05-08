@@ -1,53 +1,11 @@
-<?php 
-include 'Connect.php';
-
-if(isset($_POST['btnSave'])) 
-{
-    $cmdBuaStop=$_POST['cmdBuaStop'];
-    $cmdBusNo=$_POST['cmdBusNo'];
-    $txtStopOrder=$_POST['txtStopOrder'];
-	$Select="SELECT * FROM BR
-			WHERE BusTypeID='$cmdBusNo'
-			AND StopOrder='$txtStopOrder'
-			OR BusStopID='$cmdBuaStop'
-			AND BusTypeID='$cmdBusNo'";
-	$retSelect=mysqli_query($connection,$Select);
-	$Select_Count=mysqli_num_rows($retSelect);
-		if ($Select_Count>0) 
-		{
-			echo "<script>window.alert('Error :StopOrder Overlap')</script>";
-			echo "<script>window.location='BR.php'</script>";
-		}
-		else {
-			$Insert="INSERT INTO `br`
-				(`BusStopID`,`BusTypeID`,`StopOrder`)
-				VALUES 
-				('$cmdBuaStop','$cmdBusNo','$txtStopOrder')
-				";
-			$ret=mysqli_query($connection,$Insert);
-
-			if($ret) //True
-			{
-				echo "<script>window.alert('SUCCESS : BR Created')</script>";
-				echo "<script>window.location='BR.php'</script>";
-			}
-			else
-			{
-				echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-			}
-		}
-
-		
-	
-}
-
- ?>
+<?php
+	include('Connect.php');
+?>
 <!DOCTYPE html>
-<html lang="en" class="h-100">
+<html lang="en">
 <head>
-	<title>BR Entry</title>
-	<!-- Required meta tags -->
-	<meta charset="utf-8">
+     <!-- Required meta tags -->
+     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
@@ -56,8 +14,9 @@ if(isset($_POST['btnSave']))
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  
 </head>
-<body class="h-100">
+<body>
 <nav class="navbar navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" href="#">
       <img src="Images/B.png" width="30" height="30" alt=""><img src="Images/M2.png" width="30" height="30" alt=""> Bus Management
@@ -96,64 +55,68 @@ if(isset($_POST['btnSave']))
       </ul>
     </div>
   </nav>
-<div class="container h-100">
-<div class="row h-100 justify-content-center align-items-center">
-<div class="col-10 col-md-8 col-lg-6">
-<form action="BR.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
+<form action="RideHistoryList.php" method='post'>
+<fieldset style = "margin-top:10%;">
+<legend>Users List :</legend>
+<?php
+if (isset($_GET['UserID'])) 
+{
+$UserID = $_GET['UserID'];
+$Ride_List="SELECT r.RideID,b.BusID,b.DriverName,r.Feedback 
+            FROM ride r,bus b,users u 
+            WHERE r.BusID = b.BusID
+            AND r.UserID = u.UserID
+            AND r.UserID = $UserID";
+$Ride_ret=mysqli_query($connection,$Ride_List);
+$Ride_count=mysqli_num_rows($Ride_ret);
 
-<fieldset>
-<legend>Enter Assign BusStop Information :</legend>
-<div class="form-group">
-	<label for="BusStop">BusStop</label>
-    <select class="form-control" id="BusStop" name="cmdBuaStop">
-    <option>Choose BusStop</option>
-		<?php  
-		$BusStop_query="SELECT * FROM BusStop";
-		$BusStop_ret=mysqli_query($connection,$BusStop_query);
-		$BusStop_count=mysqli_num_rows($BusStop_ret);
+if ($Ride_count < 1) 
+{
+	echo "<p>No Bus Record Found.</p>";
+}
+else
+{
+?>
+	<table id="tableid" class="table table-bordered table-striped">
+	<thead class="thead-dark">
+	<tr>
+		<th scope="col">#</th>
+		<th scope="col">Ride ID</th>
+		<th scope="col">BusID</th>
+        <th scope="col">Driver Name</th>
+        <th scope="col">Feedback</th>
+        <th scope="col"></th>
+	</tr>
+	</thead>
+	<tbody class="table">
+	<?php 
+	for($i=0;$i<$Ride_count;$i++) 
+	{ 
+		$rows=mysqli_fetch_array($Ride_ret);
+		//print_r($rows);
 
-		for($i=0;$i<$BusStop_count;$i++) 
-		{ 
-			$row=mysqli_fetch_array($BusStop_ret);
-			$BusStopID=$row['BusStopID'];
-			$BusStop=$row['BusStop'];
+		$RideID=$rows['RideID'];
+		$BusID=$rows['BusID'];
+        $DriverName=$rows['DriverName'];
+        $Feedback=$rows['Feedback'];
 
-			echo "<option value='$BusStopID'>$BusStopID - $BusStop</option>";
-		}
-		?>
-    </select>
-</div>
-<div class="form-group">
-	<label for="BusNo">BusNo</label>
-    <select class="form-control" id="BusNo" name="cmdBusNo">
-    <option>Choose BusNo</option>
-		<?php  
-		$BusNo_query="SELECT * FROM bustype";
-		$BusNo_ret=mysqli_query($connection,$BusNo_query);
-		$BusNo_count=mysqli_num_rows($BusNo_ret);
-
-		for($i=0;$i<$BusNo_count;$i++) 
-		{ 
-			$row=mysqli_fetch_array($BusNo_ret);
-			$BusTypeID=$row['BusTypeID'];
-			$BusNo=$row['BusNo'];
-
-			echo "<option value='$BusTypeID'>$BusTypeID - $BusNo</option>";
-		}
-		?>
-    </select>
-</div>
-<div class="form-group">
-	<label for="Stop_Order">Stop_Order</label>
-	<input type="number" class="form-control" id="Stop_Order" name="txtStopOrder" min="1" max="40" placeholder="No" required/>
-</div>
-<button type="submit" class="btn btn-primary btn-customized" name="btnSave">Save</button>
-<button type="reset" class="btn btn-primary btn-customized" name="btnClear">Clear</button>
+		echo "<tr>";
+		echo "<td>" . ($i + 1) ."</td>";
+		echo "<td>$RideID</td>";
+		echo "<td>$BusID</td>";
+        echo "<td>$DriverName</td>";
+        echo "<td>$Feedback</td>";
+		echo "</tr>";
+	}
+	 ?>
+	 </tbody>
+	</table>
+<?php
+}
+}
+?>
 </fieldset>
 </form>
-</div>
-</div>
-</div>
 </body>
 </html>
 <?php

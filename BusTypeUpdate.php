@@ -1,53 +1,70 @@
-<?php 
+<?php
 include 'Connect.php';
 
-if(isset($_POST['btnSave'])) 
+if(isset($_POST['btnUpdate'])) 
 {
-    $txtStartTime=$_POST['txtStartTime'];
-    $txtStopTime=$_POST['txtStopTime'];
-    $cmdStartStop=$_POST['cmdStartStop'];
+	$BusTypeID=$_POST['txtBusTypeID'];
+	$cmdStartStop=$_POST['cmdStartStop'];
 	$cmdFinalStop=$_POST['cmdFinalStop'];
+	$txtBusNo=$_POST['txtBusNo'];
+	$txtStartTime=$_POST['txtStartTime'];
+	$txtStopTime=$_POST['txtStopTime'];
+	$txtPrice=$_POST['txtPrice'];
 	$txtNoofGates=$_POST['txtNoofGates'];
-    $txtBusNo=$_POST['txtBusNo'];
-    $txtPrice=$_POST['txtPrice'];
 	$txtBusRouteUrl=$_POST['txtBusRouteUrl'];
 
-	$Select="SELECT * FROM BusType
-			WHERE BusNo='$txtBusNo'";
-	$retSelect=mysqli_query($connection,$Select);
-	$Select_Count=mysqli_num_rows($retSelect);
-		if ($Select_Count>0) 
-		{
-			echo "<script>window.alert('Error :BusType Already Exist')</script>";
-			echo "<script>window.location='BusType.php'</script>";
-		}
-		elseif ($cmdStartStop==$cmdFinalStop) 
-		{
-			echo "<script>window.alert('Error :Same StartStop and FinalStop')</script>";
-			echo "<script>window.location='BusType.php'</script>";
-		}
-		else 
-		{
-			$Insert="INSERT INTO `bustype`
-				(`StartTime`,`StopTime`,`StartDestinationID`, `FinalDestinationID`, `NoofGates`,`BusNo`,`Price`, `BusRouteUrl`)
-				VALUES 
-				('$txtStartTime','$txtStopTime','$cmdStartStop','$cmdFinalStop', '$txtNoofGates','$txtBusNo','$txtPrice','$txtBusRouteUrl')
-				";
-			$ret=mysqli_query($connection,$Insert);
+	$Update="UPDATE BusType
+			 SET
+			 StartTime='$txtStartTime',
+			 StopTime='$txtStopTime',
+			 StartDestinationID='$cmdStartStop',
+			 FinalDestinationID='$cmdFinalStop',
+			 NoofGates='$txtNoofGates',
+			 BusNo='$txtBusNo',
+			 Price='$txtPrice',
+			 BusRouteUrl='$txtBusRouteUrl'
+			 WHERE
+			 BusTypeID='$BusTypeID'
+			 ";
+	$ret=mysqli_query($connection,$Update);
 
-			if($ret) //True
-			{
-				echo "<script>window.alert('SUCCESS : Bus Type Created')</script>";
-				echo "<script>window.location='BusType.php'</script>";
-			}
-			else
-			{
-				echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-			}
-		}
-	
+	if($ret) //True
+	{
+		echo "<script>window.alert('SUCCESS : BusType Info Updated')</script>";
+		echo "<script>window.location='BusTypeList.php'</script>";
+	}
+	else
+	{
+		echo "<p>Error : Something went wrong in Update" . mysqli_error($connection) . "</p>";
+	}
 }
 
+
+if (isset($_GET['BusTypeID'])) 
+{
+	$BusTypeID=$_GET['BusTypeID'];
+
+	$BusType_List="SELECT bt.*, sd.*, fd.* 
+				 FROM BusType bt, StartDestination sd, FinalDestination fd
+				 WHERE bt.StartDestinationID=sd.StartDestinationID
+                 AND bt.FinalDestinationID=fd.FinalDestinationID
+                 AND BusTypeID='$BusTypeID'";
+	$BusType_ret=mysqli_query($connection,$BusType_List);
+	$BusType_count=mysqli_num_rows($BusType_ret);
+	$rows=mysqli_fetch_array($BusType_ret);
+
+	if($BusType_count < 1) 
+	{
+		echo "<script>window.alert('ERROR : BusType Info Not Found')</script>";
+		echo "<script>window.location='BusTypeUpdate.php'</script>";
+	}
+}
+else
+{
+	$BusTypeID="";
+}
+
+?>
 ?>
 <!DOCTYPE html>
 <html lang="en"  class="h-100">
@@ -106,14 +123,16 @@ if(isset($_POST['btnSave']))
 <div class="container h-100">
 <div class="row h-100 justify-content-center align-items-center">
 <div class="col-10 col-md-8 col-lg-6">
-<form action="BusType.php" method="post" style = "margin-top:10%; margin-bottom:10%;">
+<form action="BusTypeUpdate.php" method="post" style = "margin-top:10%; margin-bottom:10%;">
 
 <fieldset>
 <legend>Enter BusType Information :</legend>
+<input type="hidden" name="txtBusTypeID" value="<?php echo $BusTypeID ?>">
 <div class="form-row">
 <div class="form-group col-md-6">
 	<label for="StartStop">StartStop</label>
     <select class="form-control" id="StartStop" name="cmdStartStop">
+    <option value="<?php echo $rows['StartDestinationID'] ?>"><?php echo $rows['StartDestination'] ?></option>
     <option>Choose StartStop</option>
 		<?php  
 		$Start_query="SELECT * FROM startdestination";
@@ -134,6 +153,7 @@ if(isset($_POST['btnSave']))
 <div class="form-group col-md-6">
 	<label for="FinalStop">FinalStop</label>
     <select class="form-control" id="FinalStop" name="cmdFinalStop">
+    <option value="<?php echo $rows['FinalDestinationID'] ?>"><?php echo $rows['FinalDestination'] ?></option>
     <option>Choose FinalStop</option>
 		<?php  
 		$Final_query="SELECT * FROM finaldestination";
@@ -154,31 +174,31 @@ if(isset($_POST['btnSave']))
 </div>
 <div class="form-group">
 	<label for="BusNo">BusNo</label>
-	<input type="number" class="form-control" id="BusNo" name="txtBusNo" min="1" placeholder="No" required/>
+	<input type="number" class="form-control" id="BusNo" name="txtBusNo" value="<?php echo $rows['BusNo'] ?>" required/>
 </div>
 <div class="form-row">
     <div class="form-group col-md-6">
       <label for="StartTime">StartTime</label>
-      <input type="time" class="form-control" id="StartTime" name="txtStartTime" min="04:00" max="11:00">
+      <input type="time" class="form-control" id="StartTime" name="txtStartTime" value="<?php echo $rows['StartTime'] ?>">
     </div>
     <div class="form-group col-md-6">
       <label for="StopTime">StopTime</label>
-      <input type="time" class="form-control" id="StopTime" name="txtStopTime" min="13:00" max="22:00">
+      <input type="time" class="form-control" id="StopTime" name="txtStopTime" value="<?php echo $rows['StopTime'] ?>">
     </div>
 </div>
 <div class="form-group">
 	<label for="Price">Price</label>
-	<input type="number" class="form-control" id="Price" name="txtPrice" min="100" max="300" placeholder="100-300" required/>
+	<input type="number" class="form-control" id="Price" name="txtPrice" value="<?php echo $rows['Price'] ?>" required/>
 </div>
 <div class="form-group">
 	<label for="NoofGates">No_of_Gates</label>
-	<input type="number" class="form-control" id="NoofGates" name="txtNoofGates" min="1" max="30" placeholder="No" required/>
+	<input type="number" class="form-control" id="NoofGates" name="txtNoofGates" value="<?php echo $rows['NoofGates'] ?>" required/>
 </div>
 <div class="form-group">
 	<label for="BusRouteUrl">BusRouteUrl</label>
-	<input type="url" class="form-control" id="BusRouteUrl" name="txtBusRouteUrl" placeholder="Url" required/>
+	<input type="text" class="form-control" id="BusRouteUrl" name="txtBusRouteUrl" value="<?php echo $rows['BusRouteUrl'] ?>" required/>
 </div>
-<button type="submit" class="btn btn-primary btn-customized" name="btnSave">Save</button>
+<button type="submit" class="btn btn-primary btn-customized" name="btnUpdate">Update</button>
 <button type="reset" class="btn btn-primary btn-customized" name="btnClear">Clear</button>
 </fieldset>
 </form>

@@ -1,44 +1,54 @@
 <?php 
 include 'Connect.php';
 
-if(isset($_POST['btnSave'])) 
+if(isset($_POST['btnUpdate'])) 
 {
-    $cmdBuaStop=$_POST['cmdBuaStop'];
-    $cmdBusNo=$_POST['cmdBusNo'];
-    $txtStopOrder=$_POST['txtStopOrder'];
-	$Select="SELECT * FROM BR
-			WHERE BusTypeID='$cmdBusNo'
-			AND StopOrder='$txtStopOrder'
-			OR BusStopID='$cmdBuaStop'
-			AND BusTypeID='$cmdBusNo'";
-	$retSelect=mysqli_query($connection,$Select);
-	$Select_Count=mysqli_num_rows($retSelect);
-		if ($Select_Count>0) 
-		{
-			echo "<script>window.alert('Error :StopOrder Overlap')</script>";
-			echo "<script>window.location='BR.php'</script>";
-		}
-		else {
-			$Insert="INSERT INTO `br`
-				(`BusStopID`,`BusTypeID`,`StopOrder`)
-				VALUES 
-				('$cmdBuaStop','$cmdBusNo','$txtStopOrder')
-				";
-			$ret=mysqli_query($connection,$Insert);
+	$BRID=$_POST['txtBRID'];
+	$cmdBuaStop=$_POST['cmdBuaStop'];
+	$cmdBusNo=$_POST['cmdBusNo'];
 
-			if($ret) //True
-			{
-				echo "<script>window.alert('SUCCESS : BR Created')</script>";
-				echo "<script>window.location='BR.php'</script>";
-			}
-			else
-			{
-				echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-			}
-		}
+	$Update="UPDATE BR
+			 SET
+			 BusStopID='$cmdBuaStop',
+			 BusTypeID='$cmdBusNo'
+			 WHERE
+			 BRID='$BRID'
+			 ";
+	$ret=mysqli_query($connection,$Update);
 
-		
-	
+	if($ret) //True
+	{
+		echo "<script>window.alert('SUCCESS : BR Info Updated')</script>";
+		echo "<script>window.location='BRList.php'</script>";
+	}
+	else
+	{
+		echo "<p>Error : Something went wrong in Update" . mysqli_error($connection) . "</p>";
+	}
+}
+
+if (isset($_GET['BRID'])) 
+{
+	$BRID=$_GET['BRID'];
+
+	$BR_List="SELECT bt.*, bs.*, b.*
+				 FROM BusType bt, BusStop bs, BR b
+				 WHERE bt.BusTypeID=b.BusTypeID
+                 AND bs.BusStopID=b.BusStopID
+                 AND BRID='$BRID'";
+	$BR_ret=mysqli_query($connection,$BR_List);
+	$BR_count=mysqli_num_rows($BR_ret);
+	$rows=mysqli_fetch_array($BR_ret);
+
+	if($BR_count < 1) 
+	{
+		echo "<script>window.alert('ERROR : BR Info Not Found')</script>";
+		echo "<script>window.location='BRUpdate.php'</script>";
+	}
+}
+else
+{
+	$BRID="";
 }
 
  ?>
@@ -99,13 +109,15 @@ if(isset($_POST['btnSave']))
 <div class="container h-100">
 <div class="row h-100 justify-content-center align-items-center">
 <div class="col-10 col-md-8 col-lg-6">
-<form action="BR.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
+<form action="BRUpdate.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
 
 <fieldset>
-<legend>Enter Assign BusStop Information :</legend>
+<legend>Enter BusRoute Information :</legend>
+<input type="hidden" name="txtBRID" value="<?php echo $BRID ?>">
 <div class="form-group">
 	<label for="BusStop">BusStop</label>
     <select class="form-control" id="BusStop" name="cmdBuaStop">
+    <option value="<?php echo $rows['BusStopID'] ?>"><?php echo $rows['BusStop'] ?></option>
     <option>Choose BusStop</option>
 		<?php  
 		$BusStop_query="SELECT * FROM BusStop";
@@ -126,6 +138,7 @@ if(isset($_POST['btnSave']))
 <div class="form-group">
 	<label for="BusNo">BusNo</label>
     <select class="form-control" id="BusNo" name="cmdBusNo">
+    <option value="<?php echo $rows['BusTypeID'] ?>"><?php echo $rows['BusNo'] ?></option>
     <option>Choose BusNo</option>
 		<?php  
 		$BusNo_query="SELECT * FROM bustype";
@@ -145,9 +158,9 @@ if(isset($_POST['btnSave']))
 </div>
 <div class="form-group">
 	<label for="Stop_Order">Stop_Order</label>
-	<input type="number" class="form-control" id="Stop_Order" name="txtStopOrder" min="1" max="40" placeholder="No" required/>
+	<input type="number" class="form-control" id="Stop_Order" name="txtStopOrder" value="<?php echo $rows['StopOrder'] ?>" required/>
 </div>
-<button type="submit" class="btn btn-primary btn-customized" name="btnSave">Save</button>
+<button type="submit" class="btn btn-primary btn-customized" name="btnUpdate">Update</button>
 <button type="reset" class="btn btn-primary btn-customized" name="btnClear">Clear</button>
 </fieldset>
 </form>
