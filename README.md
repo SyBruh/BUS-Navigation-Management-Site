@@ -1,7 +1,7 @@
 # BUS-Navigation-Management-Site
 Today, many public transportation systems around the world use a prepaid system. Singapore uses the Ezlink card for public transportation. 
 However, businesses that use cards and prepayments are not yet used on Burma's public transport. 
-To solve this problem, I am going to create a benevolence system using prepaid system payments via mobile applications inside public transportation. 
+To solve this problem, I am going to create a system using prepaid system payments via mobile applications for public transportation. 
 This system will be implemented on the phone through the application. This pre-system is expected to provide a better and more convenient payment system. 
 With the construction of this system, it is hoped that it can alleviate the problems that currently occur in the cash payment system. 
 Under the cash payment system, some people board the bus without paying. 
