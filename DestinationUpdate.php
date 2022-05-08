@@ -1,109 +1,109 @@
 <?php 
 include 'Connect.php';
 
-if(isset($_POST['btnSave'])) 
-    {
+if (isset($_POST['btnUpdate'])) 
+{
+	$DestinationID=$_POST['txtDestinationID'];
 	$txtDestination=$_POST['txtDestination'];
-	$Select="SELECT * FROM destination
-			WHERE Destination='$txtDestination'";
-	$retSelect=mysqli_query($connection,$Select);
-	$Select_Count=mysqli_num_rows($retSelect);
-		if ($Select_Count>0) 
-		{
-			echo "<script>window.alert('Error :Destination Already Exist')</script>";
-			echo "<script>window.location='Destination.php'</script>";
-		}
-		else 
-		{
-			$Insert="INSERT INTO `destination`
-				(`Destination`) 
-				VALUES 
-				('$txtDestination')
-				";
-			$ret=mysqli_query($connection,$Insert);
 
-			if($ret) //True
-			{
-				echo "<script>window.alert('SUCCESS :New Destination Created')</script>";
-				echo "<script>window.location='Destination.php'</script>";
-			}
-			else
-			{
-				echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-			}
+    $Destination_List="SELECT * 
+				 FROM destination
+				 WHERE DestinationID='$DestinationID'";
+	$Destination_ret=mysqli_query($connection,$Destination_List);
+	$Destination_count=mysqli_num_rows($Destination_ret);
+	$rows=mysqli_fetch_array($Destination_ret);
+    $Destination=$rows['Destination'];
+    print($Destination);
 
-			$Insert2="INSERT INTO `busstop`
-					(`BusStop`) 
-					VALUES 
-					('$txtDestination')
-					";
-			$ret2=mysqli_query($connection,$Insert2);
+	$Update1="UPDATE destination
+			 SET
+			 Destination='$txtDestination'
 
-			if($ret2) //True
-			{
-				echo "<script>window.alert('SUCCESS :New BusStop Created')</script>";
-				echo "<script>window.location='Destination.php'</script>";
-			}
-			else
-			{
-				echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-			}
+			 WHERE DestinationID='$DestinationID'";
+    
+    $Update2="UPDATE startdestination
+			 SET
+			 StartDestination='$txtDestination'
 
-			$Destination_query="SELECT * FROM Destination";
-			$Destination_ret=mysqli_query($connection,$Destination_query);
-			$Destination_count=mysqli_num_rows($Destination_ret);
+			 WHERE DestinationID='$DestinationID'";
 
-			for($i=0;$i<$Destination_count;$i++) 
-			{ 
-				$row=mysqli_fetch_array($Destination_ret);
-				$DestinationID=$row['DestinationID'];
-				$Destination=$row['Destination'];
+    $Update3="UPDATE finaldestination
+            SET
+            FinalDestination='$txtDestination'
 
-				if ($Destination == $txtDestination) 
-				{
-					$Insert3="INSERT INTO startdestination
-					(StartDestination, DestinationID)
-					VALUES
-					('$txtDestination', '$DestinationID')
-					";
-					$ret3=mysqli_query($connection,$Insert3);
+            WHERE DestinationID='$DestinationID'";         
 
-					if($ret3) //True
-					{
-						echo "<script>window.alert('SUCCESS :New StartDestination Created')</script>";
-						echo "<script>window.location='Destination.php'</script>";
-					}
-					else
-					{
-						echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-					}
+    $Update4="UPDATE busstop
+            SET
+            BusStop='$txtDestination'
 
-					$Insert4="INSERT INTO finaldestination
-							(FinalDestination, DestinationID)
-							VALUES
-							('$txtDestination', '$DestinationID')
-							";
-					$ret4=mysqli_query($connection,$Insert4);
+            WHERE BusStop='$Destination'";
 
-					if($ret4) //True
-					{
-						echo "<script>window.alert('SUCCESS :New FinalDestination Created')</script>";
-						echo "<script>window.location='Destination.php'</script>";
-					}
-					else
-					{
-						echo "<p>Error : Something went wrong " . mysqli_error($connection) . "</p>";
-					}
-				}
-			}
-		}
-  	}  
+	$ret1=mysqli_query($connection,$Update1);
+    $ret2=mysqli_query($connection,$Update2);
+    $ret3=mysqli_query($connection,$Update3);
+    $ret4=mysqli_query($connection,$Update4);
+
+	if($ret1 and $ret2 and $ret3 and $ret4) //True
+	{
+		echo "<script>window.alert('SUCCESS : Destination Info Updated')</script>";
+		echo "<script>window.location='DestinationList(New).php'</script>";
+	}
+    elseif ($ret1) 
+    {
+       print("up 1 complete");
+    }
+    elseif ($ret2) 
+    {
+       print("up 2 complete");
+    }
+    elseif ($ret3) 
+    {
+       print("up 3 complete");
+    }
+    elseif ($ret4) 
+    {
+       print("up 4 complete");
+    }
+	else
+	{
+		echo "<p>Error : Something went wrong in Update" . mysqli_error($connection) . "</p>";
+	}
+}
+else
+{
+	$DestinationID="";
+}
+
+if (isset($_GET['DestinationID'])) 
+{
+	$DestinationID=$_GET['DestinationID'];
+
+	$Destination_List="SELECT * 
+				 FROM destination
+				 WHERE DestinationID='$DestinationID'";
+	$Destination_ret=mysqli_query($connection,$Destination_List);
+	$Destination_count=mysqli_num_rows($Destination_ret);
+	$rows=mysqli_fetch_array($Destination_ret);
+
+	if($Destination_count < 1) 
+	{
+		echo "<script>window.alert('ERROR : Destination Info Not Found')</script>";
+		echo "<script>window.location='Destinationlist(New).php'</script>";
+	}
+}
+else
+{
+	$DestinationID="";
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en" class="h-100">
 <head>
-     <!-- Required meta tags -->
-     <meta charset="utf-8">
+	<title>Destination Entry</title>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
@@ -114,7 +114,7 @@ if(isset($_POST['btnSave']))
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
   
 </head>
-<body class="h-100" style="background-color: rgba(194, 201, 157, 0.38);">
+<body class="h-100">
 <nav class="navbar navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" href="#">
       <img src="Images/B.png" width="30" height="30" alt=""><img src="Images/M2.png" width="30" height="30" alt=""> Bus Management
@@ -156,15 +156,16 @@ if(isset($_POST['btnSave']))
 <div class="container h-100">
     <div class="row h-100 justify-content-center align-items-center">
         <div class="col-10 col-md-8 col-lg-6">
-			<form action="Destination.php" method="post" style = "margin-top:10%; margin-bottom:10%;">
+			<form action="DestinationUpdate.php" method="post" style = "margin-top:10%; margin-bottom:10%;" >
 
 			<fieldset>
 			<legend>Enter Destination Information :</legend>
+			<input type="hidden" name="txtDestinationID" value="<?php echo $DestinationID ?>">
 			<div class="form-group">
 				<label for="Destination">Destination</label>
-				<input type="text" class="form-control" id="Destination" name="txtDestination" maxlength="25" size="25" placeholder="Place" required/>
+				<input type="text" class="form-control" id="Destination" name="txtDestination" value="<?php echo $rows['Destination'] ?>" required/>
 			</div>
-			<button type="submit" class="btn btn-primary btn-customized" name="btnSave">Save</button>
+			<button type="submit" class="btn btn-primary btn-customized" name="btnUpdate">Update</button>
 			<button type="reset" class="btn btn-primary btn-customized" name="btnClear">Clear</button>
 			</fieldset>
 			</form>

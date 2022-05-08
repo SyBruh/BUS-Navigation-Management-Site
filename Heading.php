@@ -1,12 +1,10 @@
 <?php
- include 'Connect.php';
-
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Manager Home Page</title>
-	<!-- Required meta tags -->
+	<title>header</title>
+    <!-- Required meta tags -->
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -18,7 +16,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-dark bg-dark">
     <a class="navbar-brand" href="#">
       <img src="Images/B.png" width="30" height="30" alt=""><img src="Images/M2.png" width="30" height="30" alt=""> Bus Management
     </a>
@@ -43,12 +41,12 @@
             <a class="dropdown-item" href="BusTypeList.php">BusType/BusRoute Lists</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="BusList.php">Bus Lists</a>
-            <a class="dropdown-item" href="BRList.php">BusStop assign Lists</a>
+            <a class="dropdown-item" href="BRList.php">BusStops assign Lists</a>
             <a class="dropdown-item" href="RouteList.php">Route Lists</a>
           </div>
         </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="UserInfoList.php">Users Information</a>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#">Users Information</a>
         </li>
         <li class="nav-item active">
           <a class="nav-link" href="ManagerLogin.php">Logout</a>
@@ -56,60 +54,5 @@
       </ul>
     </div>
   </nav>
-<div class="row h-100 justify-content-center align-items-center" style="background-color: rgba(194, 201, 157, 0.38);">
-<form  style = "margin-top:10%; margin-bottom:10%;" >
-<div class="form-row">
-    <div class="form-group col-md-6">
-		<div class="card" style="width: 18rem;">
-			<div class="card-body">
-				<h5 class="card-title">Destination</h5>
-				<p class="card-text">To Add New Destinations/BusStops</p>
-				<a href="Destination.php" class="card-link">Add Destination</a>
-			</div>
-		</div>
-    </div>
-    <div class="form-group col-md-6">
-		<div class="card" style="width: 18rem;">
-			<div class="card-body">
-				<h5 class="card-title">BusType</h5>
-				<p class="card-text">To Add New BusNo/Route of the Unique Bus No</p>
-				<a href="BusType.php" class="card-link">Add BusType</a>
-			</div>
-		</div>
-    </div>
-	<div class="form-group col-md-6">
-		<div class="card" style="width: 18rem;">
-			<div class="card-body">
-				<h5 class="card-title">Assign BusStop</h5>
-				<p class="card-text">To Add the BusStop for each BusRoute</p>
-				<a href="BR.php" class="card-link">Assign BusStop</a>
-			</div>
-		</div>
-    </div>
-	<div class="form-group col-md-6">
-		<div class="card" style="width: 18rem;">
-			<div class="card-body">
-				<h5 class="card-title">Bus</h5>
-				<p class="card-text">To Add the Bus Detail including bus driver</p>
-				<a href="Bus.php" class="card-link">Add Bus</a>
-			</div>
-		</div>
-    </div>
-	<div class="form-group col-md-6">
-		<div class="card" style="width: 18rem;">
-			<div class="card-body">
-				<h5 class="card-title">Route</h5>
-				<p class="card-text">To Add the Route for each startdestination and finaldestination</p>
-				<a href="Route.php" class="card-link">Add Route</a>
-			</div>
-		</div>
-    </div>
-</div>
-
-</form> 
-</div>
 </body>
 </html>
-<?php
-include 'Footing.php';
-?>
